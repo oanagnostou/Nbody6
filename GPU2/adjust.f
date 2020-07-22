@@ -181,7 +181,7 @@
           RMIN0 = RMIN
 *
 *       Form close encounter distance from scale factor & density contrast.
-          RMIN = 4.0*RSCALE/(FLOAT(N)*RHOD**0.3333)
+          RMIN = 4.0*RSCALE/(FLOAT(N)*MIN(RHOD,3.0D0)**0.333) !! MTaddmodified for IMBH
 *       Include alternative expression based on core radius (experimental).
           IF (KZ(16).GT.1.AND.NC.LT.0.01*N) THEN
               RMIN = MAX(RMIN,0.01*RC/FLOAT(NC)**0.3333)
@@ -412,6 +412,11 @@
       IF (KZ(1).EQ.2.AND.NSUB.EQ.0) THEN
           IF (IOUT.GT.0) CALL MYDUMP(1,1)
       END IF
+      
+*     (dumb) sequential dump every 10 Tdyn
+      IF(MOD(INT(TTOT),10).EQ.0) THEN
+         IF (KZ(2).GE.1.AND.NSUB.EQ.0) CALL MYDUMP(1,INT(TTOT+1000000))
+      ENDIF
 *
 *       Check termination criteria (TIME > TCRIT, N <= NCRIT & next TADJ).
       IF (TTOT.GE.TCRIT.OR.N.LE.NCRIT.OR.TTOT+DTADJ.GT.TCRIT) THEN
